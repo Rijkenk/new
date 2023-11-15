@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>14-1 Scoreboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <script src="jquery.fullscreen-min.js"></script>
+    <script src="localDB.min.js"></script>
+    <style>
+	td {
+		border: 1px solid;
+		overflow: hidden;
+		text-align: center;
+	}
+</style> <script>
+//Initialisierung
+	var rest = 15; 							var punkte = 0; 							var punkte1 = 0; 
+  var punkte2 = 0; 						var spielerAktiv = 0; 				var logText = ""; 
+  var runTo = 999; 						var anstoss = 0;							var foulRechts = 0; 
+  var foulzaehlerRechts = 0; 	var foulLinks = 0; 						var foulzaehlerLinks = 0; 
+  var aufnahmeHoechsteL = 0;	var aufnahmeHoechsteR = 0; 		var aufnahmeHoehe = 0;
+	var aufnahmen1 = 0; 				var aufnahmen2 = 0; 					var stoppuhr = 0; 
+  var pstoppuhr = 0; 					var wstoppuhr = 0;
+    
+	localDB.schema('spielelog', ['zeitstempel','ereignis','rBaelle','aufnahmenL','aufnahmeHoeheL','foulzaehlerL','punkteL','punkteR','foulzaehlerR','aufnahmeHoeheR','aufnahmenR','spielzeit']); // DB Tabelle definieren
+	localDB.schema('spielelog2', ['zeitstempel','ereignis','rBaelle','aufnahmenL','aufnahmeHoeheL','foulzaehlerL','punkteL','punkteR','foulzaehlerR','aufnahmeHoeheR','aufnahmenR','spielzeit']); // DB Tabelle definieren
+	
+  $("#linkerZaehler").text(punkte1);
+	$("#rechterZaehler").text(punkte2);
+// $(document).on('pageinit', function() 		
+$(document).ready(function(){
+	$('.timer').hide(); $('#btnWeiter').hide(); $('#btnPause').hide(); $('#btnSave').hide(); $('#btnEnde').hide(); $('.fButtons').hide();
+	$('.Zaehler').hide(); $('#statistikL').hide(); $('#statistikR').hide(); $('#spielerNameL').hide(); $('#spielerNameR').hide();
+	ausblenden(0);
+	$("#linkerZaehler").text(punkte1); $("#rechterZaehler").text(punkte2);
+	$('#btnVollbild').on( "vclick", function(){
+		$('#btnVollbild').hide();
+		$(document).fullScreen(true);}) // Fullscreen Addon geladen?
+	$('#btnBreakLinks').on( "vclick", function(){
+		anstoss = 1;
+		spielerAktiv = 1;
+		spielStart();
+		ausblenden(15);
+		aufnahmeWechsel();
+		spieleLog('Break links');})
+	$('#btnBreakRechts').on( "vclick", function(){
+		anstoss = 2;
+		spielerAktiv = 2;
+		spielStart();
+		ausblenden(15);
+		aufnahmeWechsel();
+		spieleLog('Break rechts');
+	})
+	$('#15Ball').on( "vclick", function(event){
+		rest = 15;
+		punkte += 0;logText = " Abgabe"; aktualisieren();})
+	$('#14Ball').on( "vclick", function(){
+		rest = 14;
+		if ($('#15Ball').is(':visible')){
+			ausblenden(rest);
+			punkte += 1; logText = " +"+ punkte; aktualisieren();}
+		else{logText = " Abgabe"; aktualisieren();}})
+	$('#13Ball').on( "vclick", function(){
+		rest = 13;
+		switch (true) {
+			case ($('#15Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 2;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#14Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 1;	logText = " +"+ punkte; aktualisieren();
+				break;
+			default:
+				logText = " Abgabe"; aktualisieren();
+				break;
+	} })
+	$('#12Ball').on( "vclick", function(){
+		rest = 12;
+		switch (true) {
+			case ($('#15Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 3;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#14Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 2;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#13Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 1;	logText = " +"+ punkte; aktualisieren();
+				break;
+			default:
+				logText = " Abgabe"; aktualisieren();
+				break;
+	}})
+	$('#11Ball').on( "vclick", function(){
+		rest = 11;
+		switch (true) {
+			case ($('#15Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 4;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#14Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 3;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#13Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 2;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#12Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 1;	logText = " +"+ punkte; aktualisieren();
+				break;
+			default:
+				logText = " Abgabe"; aktualisieren();
+				break;
+	}})
+	$('#10Ball').on( "vclick", function(){
+		rest = 10;
+		switch (true) {
+			case ($('#15Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 5;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#14Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 4;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#13Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 3;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#12Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 2;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#11Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 1;	logText = " +"+ punkte; aktualisieren();
+				break;
+			default:
+				logText = " Abgabe"; aktualisieren();
+				break;
+	}})
+	$('#9Ball').on( "vclick", function(){
+		rest = 9;
+		switch (true) {
+			case ($('#15Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 6;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#14Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 5;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#13Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 4;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#12Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 3;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#11Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 2;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#10Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 1;	logText = " +"+ punkte; aktualisieren();
+				break;
+			default:
+				logText = " Abgabe"; aktualisieren();
+				break;
+	}})	
+	$('#8Ball').on( "vclick", function(){
+		rest = 8;
+		switch (true) {
+			case ($('#15Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 7;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#14Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 6;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#13Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 5;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#12Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 4;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#11Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 3;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#10Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 2;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#9Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 1;	logText = " +"+ punkte; aktualisieren();
+				break;
+			default:
+				logText = " Abgabe"; aktualisieren();
+				break;
+	}})
+	$('#7Ball').on( "vclick", function(){
+		rest = 7;
+		switch (true) {
+			case ($('#15Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 8;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#14Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 7;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#13Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 6;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#12Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 5;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#11Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 4;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#10Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 3;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#9Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 2;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#8Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 1;	logText = " +"+ punkte; aktualisieren();
+				break;
+			default:
+				logText = " Abgabe"; aktualisieren();
+				break;
+	}})
+	$('#6Ball').on( "vclick", function(){
+		rest = 6;
+		switch (true) {
+			case ($('#15Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 9;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#14Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 8;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#13Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 7;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#12Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 6;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#11Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 5;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#10Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 4;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#9Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 3;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#8Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 2;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#7Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 1;	logText = " +"+ punkte; aktualisieren();
+				break;
+			default:
+				logText = " Abgabe"; aktualisieren();
+				break;
+	}})
+	$('#5Ball').on( "vclick", function(){
+		rest = 5;
+		switch (true) {
+			case ($('#15Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 10;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#14Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 9;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#13Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 8;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#12Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 7;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#11Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 6;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#10Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 5;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#9Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 4;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#8Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 3;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#7Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 2;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#6Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 1;	logText = " +"+ punkte; aktualisieren();
+				break;
+			default:
+				logText = " Abgabe"; aktualisieren();
+				break;
+	}})
+	$('#4Ball').on( "vclick", function(){
+		rest = 4;
+		switch (true) {
+			case ($('#15Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 11;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#14Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 10;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#13Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 9;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#12Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 8;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#11Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 7;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#10Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 6;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#9Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 5;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#8Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 4;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#7Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 3;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#6Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 2;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#5Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 1;	logText = " +"+ punkte; aktualisieren();
+				break;
+			default:
+				logText = " Abgabe"; aktualisieren();
+				break;
+	}})
+	$('#3Ball').on( "vclick", function(){
+		rest = 3;
+		switch (true) {
+			case ($('#15Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 12;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#14Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 11;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#13Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 10;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#12Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 9;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#11Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 8;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#10Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 7;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#9Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 6;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#8Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 5;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#7Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 4;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#6Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 3;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#5Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 2;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#4Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 1;	logText = " +"+ punkte; aktualisieren();
+				break;
+			default:
+				logText = " Abgabe"; aktualisieren();
+				break;
+	}})
+	$('#2Ball').on( "vclick", function(){
+		rest = 2;
+		switch (true) {
+			case ($('#15Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 13;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#14Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 12;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#13Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 11;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#12Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 10;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#11Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 9;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#10Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 8;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#9Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 7;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#8Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 6;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#7Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 5;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#6Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 4;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#5Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 3;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#4Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 2;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#3Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 1;	logText = " +"+ punkte; aktualisieren();
+				break;
+			default:
+				logText = " Abgabe"; aktualisieren();
+				break;
+	}})
+	$('#1Ball').on( "vclick", function(){
+		rest = 1;
+		switch (true) {
+			case ($('#15Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 14;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#14Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 13;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#13Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 12;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#12Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 11;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#11Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 10;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#10Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 9;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#9Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 8;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#8Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 7;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#7Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 6;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#6Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 5;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#5Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 4;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#4Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 3;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#3Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 2;	logText = " +"+ punkte; aktualisieren();
+				break;
+			case ($('#2Ball').is(':visible')):
+				ausblenden(rest);
+				punkte += 1;	logText = " +"+ punkte; aktualisieren();
+				break;
+			default:
+				logText = " Abgabe"; aktualisieren();
+				break;
+	}})
+	$('#pBtnFoul1').on( "vclick", function(){
+		if (spielerAktiv == 1){
+			if($('#pBtnFoul1').text() == "FOUL+"){
+				foulLinks = 1; foulzaehlerLinks ++;
+				$('#pBtnFoul1').css("color", "red");
+				$('#pBtnFoul1').text("FOUL!");
+			}else{
+				foulLinks = 0; foulzaehlerLinks --;
+				$('#pBtnFoul1').css("color", "black");
+				$('#pBtnFoul1').text("FOUL+");
+			} 
+		}
+	})
+	$('#pBtnFoul2').on( "vclick", function(){
+		if (spielerAktiv == 2){
+			if($('#pBtnFoul2').text() == "FOUL+"){
+				foulRechts = 1; foulzaehlerRechts ++;
+				$('#pBtnFoul2').css("color", "red");
+				$('#pBtnFoul2').text("FOUL!");
+			}else{
+				foulRechts = 0; foulzaehlerRechts --;
+				$('#pBtnFoul2').css("color", "black");
+				$('#pBtnFoul2').text("FOUL+");
+			} 		
+		}
+	})
+// #### Stoppuhr #####
+	$('.timer').on( "vclick", function(){ // Pause
+		$('#btnPause').hide();
+		pstoppuhr = unixMs;
+		$('#btnWeiter').show();
+		if (aufnahmen1 >= aufnahmen2){var test = aufnahmen1;}else{var test = aufnahmen2;}
+		spieleLog('Spel gepauzeerd');})
+	$('#btnPause').on( "vclick", function(){ 	// Pause
+		$('#btnPause').hide();
+		$('.timer').hide();
+		pstoppuhr = unixMs;
+		$('#btnWeiter').show();
+		if (aufnahmen1 >= aufnahmen2){var test = aufnahmen1;}else{var test = aufnahmen2;}
+		spieleLog('Spel gepauzeerd');})	
+	$('#btnWeiter').on( "vclick", function(){ 	// Weiter
+		spielWeiter();})
+	$('#btnSpBeenden').on( "vclick", function(){ 	
+		$('.timer').hide(); $('.mitteBtns').hide(); $('.fButtons').hide(); $('.Zaehler').hide(); $('#btnPause').hide(); $('#statistikL').hide(); $('#statistikR').hide();		
+		$('#btnBreakLinks').show(); $('#btnBreakRechts').show();
+		$('#lBlock').css("background-color", "");$('#rBlock').css("background-color", "");
+		ausblenden(15);
+		//if (aufnahmen1 >= aufnahmen2){var test = aufnahmen1;}else{var test = aufnahmen2;}
+		spieleLog('Spel beëindigd');
+		aufnahmen1 = 0; aufnahmen2 = 0; punkte1 = 0; punkte2 = 0; foulzaehlerLinks = 0; foulzaehlerRechts = 0;
+		punkte1 = 0; punkte2 = 0; aufnahmen1 = 0; aufnahmen2 = 0; runTo = 999; aufnahmeHoechsteL = 0; aufnahmeHoechsteR = 0;
+		$("#statGdL").text(0); $("#statGdR").text(0);
+		$('#pBtnFoul1').text("FOUL+"); $('#pBtnFoul1').css("color", "black");
+		$('#pBtnFoul2').text("FOUL+"); $('#pBtnFoul2').css("color", "black");
+		$("#btnSpielziel").text("Run To");
+		$("#linkerZaehler").text(punkte1);
+		$("#rechterZaehler").text(punkte2);
+		aktualisiereFoul();
+		$( window ).resize();
+		stoppuhr = 0; pstoppuhr = 0; wstoppuhr = 0;
+		localDB.empty('spielelog');
+	})
+	$('#btnLog').on( "vclick", function(){ 			
+		$('#btnUndo').show();
+		var tabDaten = "";
+		var cursor = localDB.findAll('spielelog');
+		var logdata = cursor.fetch();
+		var i = cursor.count() - 1;
+		//logdata.reverse();
+		var jetzt = new Date();
+		for(i; i > 0; i--){
+			// loesche Logs aelter 1 Tag bzw 86400000 ms
+			if((jetzt.getTime() - logdata[i].zeitstempel) < 86400000){
+				d = new Date(logdata[i].zeitstempel);
+				tabDaten = tabDaten + "<tr><td>"+ d.toLocaleString() +"</td><td>"+ logdata[i].ereignis +"</td><td>"+ logdata[i].rBaelle +"</td><td>"+ logdata[i].aufnahmenL +"</td><td>"+ logdata[i].aufnahmeHoeheL +"</td><td>"+ logdata[i].foulzaehlerL +"</td><td>";
+				tabDaten = tabDaten + logdata[i].punkteL +" : "+ logdata[i].punkteR +"</td><td>"+ logdata[i].foulzaehlerR +"</td><td>"+ logdata[i].aufnahmeHoeheR +"</td><td>"+ logdata[i].aufnahmenR +"</td><td>"+ logdata[i].spielzeit +"</td></tr>";
+			}else{
+				localDB.remove('spielelog', {is: {zeitstempel:logdata[i].zeitstempel}});
+			}	
+		}
+		$('#logBody').append(tabDaten);
+	})
+	$('#btnLog2').on( "vclick", function(){ 			
+		$('#btnUndo').hide();
+		$('#logBody').text("");
+		var tabDaten = "";
+		var cursor = localDB.findAll('spielelog2');
+		var logdata = cursor.fetch();
+		var i = cursor.count() - 1;
+		//logdata.reverse();
+		var jetzt = new Date();
+		for(i; i > 0; i--){
+			// loesche Logs aelter 2 Tage bzw 172800000 ms
+			if((jetzt.getTime() - logdata[i].zeitstempel) < 172800000){
+				d = new Date(logdata[i].zeitstempel);
+				tabDaten = tabDaten + "<tr><td>"+ d.toLocaleString() +"</td><td>"+ logdata[i].ereignis +"</td><td>"+ logdata[i].rBaelle +"</td><td>"+ logdata[i].aufnahmenL +"</td><td>"+ logdata[i].aufnahmeHoeheL +"</td><td>"+ logdata[i].foulzaehlerL +"</td><td>";
+				tabDaten = tabDaten + logdata[i].punkteL +" : "+ logdata[i].punkteR +"</td><td>"+ logdata[i].foulzaehlerR +"</td><td>"+ logdata[i].aufnahmeHoeheR +"</td><td>"+ logdata[i].aufnahmenR +"</td><td>"+ logdata[i].spielzeit +"</td></tr>";
+			}else{
+				localDB.remove('spielelog', {is: {zeitstempel:logdata[i].zeitstempel}});
+			}	
+		}
+		$('#logBody').append(tabDaten);
+	})
+	$('#btnUndo').on( "vclick", function(){
+		var cursor = localDB.findAll('spielelog');
+		var logdata = cursor.fetch();
+		var i = cursor.count() - 1;
+		//alert(logdata[i-1].foulzaehlerL +" - "+ foulzaehlerLinks);
+		//alert(logdata[i].zeitstempel +" | "+ logdata[i].ereignis +" | "+ logdata[i].punkteL +":"+ logdata[i].punkteR +" | "+ logdata[i].spielzeit);
+		punkte1 = logdata[i - 1].punkteL; punkte2 = logdata[i - 1].punkteR;
+		aufnahmen1 = logdata[i - 1].aufnahmenL; aufnahmen2 = logdata[i - 1].aufnahmenR;
+		foulzaehlerLinks = logdata[i-1].foulzaehlerL; foulzaehlerRechts = logdata[i-1].foulzaehlerR;
+		aufnahmeHoechsteL = logdata[i-1].aufnahmeHoeheL; aufnahmeHoechsteR = logdata[i-1].aufnahmeHoeheR;
+		localDB.remove('spielelog', {is: {zeitstempel:logdata[i].zeitstempel}});
+		
+		$("#linkerZaehler").text(punkte1); $("#rechterZaehler").text(punkte2);
+		$("#aufnahmen1").text("A "+ aufnahmen1); $("#aufnahmen2").text("A "+ aufnahmen2);
+		rest = logdata[i - 1].rBaelle; ausblenden(15);  ausblenden(rest);
+		if (spielerAktiv == 1){spielerAktiv = 2; $('#rBlock').css("background-color", "LightGreen");$('#lBlock').css("background-color", "");
+		}else{spielerAktiv = 1;	$('#lBlock').css("background-color", "LightGreen");$('#rBlock').css("background-color", "");}
+		if(spielerAktiv == 1){aufnahmen1 ++;}
+		if(spielerAktiv == 2){aufnahmen2 ++;}
+		var jetzt = new Date();
+		var log = {zeitstempel: jetzt.getTime(),
+					ereignis: "UNDO",
+					rBaelle: logdata[i - 1].rBaelle,
+					aufnahmenL: logdata[i - 1].aufnahmenL,
+					aufnahmeHoeheL: aufnahmeHoechsteL,
+					foulzaehlerL: logdata[i-1].foulzaehlerL,
+					punkteL: logdata[i - 1].punkteL,
+					punkteR: logdata[i - 1].punkteR,
+					foulzaehlerR: logdata[i-1].foulzaehlerR,
+					aufnahmeHoeheR: aufnahmeHoechsteR,
+					aufnahmenR: logdata[i - 1].aufnahmenR,
+					spielzeit: timerAusgabe};
+        localDB.add('spielelog2', log);
+		$('#logBody').text("");
+		$('#btnLog').click();
+		aktualisiereFoul();
+		aktualisiereStats();
+	})
+	$('#btnLogsLoeschen').on( "vclick", function(){ 	
+		$("#logBody").text('');
+		$("#liste").text('');
+		localDB.empty('spielelog');
+		localDB.empty('spielelog2');
+	})
+	$('.btnLogZurueck').on( "vclick", function(){ 	
+		$("#liste").text('');
+		$('#logBody').text('');
+	})
+	$('#btnSpZielZurueck').on( "vclick", function(){
+		runTo = $('#inpRunTo').val();
+		//alert(runTo);
+		$('#btnSpielziel').text("Race naar  "+ runTo);
+	})
+	$(window).resize();
+});
+// ##### Neuberechnung Fensteraufteilung #Scoreboard #####
+	$(window).resize(function(){
+		if ($(document).fullScreen() == false){$('#btnVollbild').show();}
+		viewPortHeight = $(window).height();
+		headerHeight = $('div[data-role="header"]').height();
+		footerHeight = $('div[data-role="footer"]').height();
+		contentHeight = viewPortHeight - headerHeight - footerHeight;
+		if ($('#spielerNameL').is(':visible')){
+			$(".Zaehler").css("font-size",contentHeight*0.7);
+			$(".Zaehler").css("margin-top","-0.35em");
+			$(".Zaehler").css("margin-bottom","-0.2em");
+		}else{
+			$(".Zaehler").css("font-size",contentHeight*0.8);
+			$(".Zaehler").css("margin-top","-0.2em");
+			$(".Zaehler").css("margin-bottom","-0.2em");
+			$("#pBtnFoul1").css("margin-top","-0.3em");
+			$("#statistikL").css("margin-bottom","0.3em");
+			$("#pBtnFoul2").css("margin-top","-0.3em");
+			$("#statistikR").css("margin-bottom","0.3em");}
+		if (punkte1 > 9 || punkte2 > 9 || punkte1 < 0 || punkte2 < 0){
+			if ($('#spielerNameL').is(':visible')){
+				$(".Zaehler").css("font-size",contentHeight*0.6);
+				$(".Zaehler").css("margin-top","-0.25em");
+				$(".Zaehler").css("margin-bottom","-0.25em");
+			}else{
+				$(".Zaehler").css("font-size",contentHeight*0.6);
+				$(".Zaehler").css("margin-top","0em");
+				$(".Zaehler").css("margin-bottom","-0.1em");
+				$("#pBtnFoul1").css("margin-top","-0.3em");
+				$("#statistikL").css("margin-bottom","0.3em");
+				$("#pBtnFoul2").css("margin-top","-0.3em");
+				$("#statistikR").css("margin-bottom","0.3em");}}
+		if (punkte1 > 99 || punkte2 > 99 || punkte1 < -9 || punkte2 < -9){
+			if ($('#spielerNameL').is(':visible')){
+				$(".Zaehler").css("font-size",contentHeight*0.4);
+				$(".Zaehler").css("margin-top","0.1em");
+				$(".Zaehler").css("margin-bottom","-0.25em");
+			}else{
+				$(".Zaehler").css("font-size",contentHeight*0.45);
+				$(".Zaehler").css("margin-top","0.1em");
+				$(".Zaehler").css("margin-bottom","0.15em");
+				$("#pBtnFoul1").css("margin-bottom","1em");
+				$("#statistikL").css("margin-bottom","0.25em");
+				$("#pBtnFoul2").css("margin-bottom","1em");
+				$("#statistikR").css("margin-bottom","0.25em");}}
+		screenWidth = $(document).width();
+		$(".Baelle").css("width",(screenWidth - 90)/15 + 'px');
+		$(".mitteBtns").css("width",screenWidth*0.09 + 'px');
+		//$(".mitteBtns").css("height",contentHeight / (2*6)  + 'px');
+		$(".mitteBtns").css('height','18px');
+		//var log = "contentHeight = " + contentHeight;
+		//console.log(log);
+		//$(".fButtons").css("width",screenWidth*0.03 + 'px');
+		viewPortHeight = $(window).height();
+		headerHeight = $('div[data-role="header"]').height();
+		footerHeight = $('div[data-role="footer"]').height();
+		contentHeight = viewPortHeight - headerHeight - footerHeight - 50;
+		$('.page-content').css("height", contentHeight + 'px');
+	})
+// ##### Neuberechnung der Seitenaufteilung fuer Page #Scoreboard antriggern #####
+$(document).on("pageshow","#Scoreboard",function(){ // Wenn Page #Scoreboard geladen
+	$(window).resize();
+ });
+// ##### Baelle ausblenden #####
+	function ausblenden(bis){
+		if (15 == bis){
+			$('#1Ball').fadeIn('slow', function(){$('#2Ball').fadeIn('slow'); $('#3Ball').fadeIn('slow'); $('#4Ball').fadeIn('slow');
+			$('#5Ball').fadeIn('slow'); $('#6Ball').fadeIn('slow'); $('#7Ball').fadeIn('slow'); $('#8Ball').fadeIn('slow'); $('#9Ball').fadeIn('slow'); 
+			$('#9Ball').fadeIn('slow'); $('#10Ball').fadeIn('slow'); $('#11Ball').fadeIn('slow'); $('#12Ball').fadeIn('slow');
+			$('#13Ball').fadeIn('slow'); $('#14Ball').fadeIn('slow'); $('#15Ball').fadeIn('slow');
+			$( window ).resize();});}
+		if (15 > bis){$('#15Ball').fadeOut('slow');}
+		if (14 > bis){$('#14Ball').fadeOut('slow');}
+		if (13 > bis){$('#13Ball').fadeOut('slow');}
+		if (12 > bis){$('#12Ball').fadeOut('slow');}
+		if (11 > bis){$('#11Ball').fadeOut('slow');}
+		if (10 > bis){$('#10Ball').fadeOut('slow');}
+		if (9 > bis){$('#9Ball').fadeOut('slow');}
+		if (8 > bis){$('#8Ball').fadeOut('slow');}
+		if (7 > bis){$('#7Ball').fadeOut('slow');}
+		if (6 > bis){$('#6Ball').fadeOut('slow');}
+		if (5 > bis){$('#5Ball').fadeOut('slow');}
+		if (4 > bis){$('#4Ball').fadeOut('slow');}
+		if (3 > bis){$('#3Ball').fadeOut('slow');}
+		if (2 > bis){$('#2Ball').fadeOut('slow');}
+		if (1 > bis){$('#1Ball').fadeOut('slow');}
+	}
+// ##### Foulanzeigen  aktualisieren #####	
+	function aktualisiereFoul(){
+		if (foulzaehlerLinks == 0){$('#foulZaehlerL').text("0"); $('#foulZaehlerL').css("color", "black"); $('#foulZaehlerL').css("font-weight", "normal");}
+		if (foulzaehlerLinks == 1){$('#foulZaehlerL').text("X"); $('#foulZaehlerL').css("color", "orange"); $('#foulZaehlerL').css("font-weight", "bold");}
+		if (foulzaehlerLinks == 2){$('#foulZaehlerL').text("XX"); $('#foulZaehlerL').css("color", "red"); $('#foulZaehlerL').css("font-weight", "bold");}
+		if (foulzaehlerRechts == 0){$('#foulZaehlerR').text("0"); $('#foulZaehlerR').css("color", "black"); $('#foulZaehlerR').css("font-weight", "normal");}
+		if (foulzaehlerRechts == 1){$('#foulZaehlerR').text("X"); $('#foulZaehlerR').css("color", "orange"); $('#foulZaehlerR').css("font-weight", "bold");}
+		if (foulzaehlerRechts == 2){$('#foulZaehlerR').text("XX"); $('#foulZaehlerR').css("color", "red"); $('#foulZaehlerR').css("font-weight", "bold");}
+		$('#pBtnFoul1').css("color", "black"); $('#pBtnFoul1').text("FOUL+");
+		$('#pBtnFoul2').css("color", "black"); $('#pBtnFoul2').text("FOUL+");
+	}
+// ##### Statistiken aktualisieren #####	
+	function aktualisiereStats(){
+		if (punkte1 > 0){$("#statGdL").text((punkte1 / aufnahmen1).toFixed(1));}
+		if (punkte2 > 0){$("#statGdR").text((punkte2 / aufnahmen2).toFixed(1));}
+		$("#statAufnL").text(aufnahmen1);
+		$("#statAufnR").text(aufnahmen2);
+		$("#statHoechsteL").text(aufnahmeHoechsteL);
+		$("#statHoechsteR").text(aufnahmeHoechsteR);
+	}
+// ##### Aktualisieren #####
+	function aktualisieren(){
+		aufnahmeHoehe = aufnahmeHoehe + punkte;
+		if(spielerAktiv == 1){
+			if(aufnahmeHoehe > 0){foulzaehlerLinks = 0;}
+			if(aufnahmeHoehe > 0 && foulLinks == 1){foulzaehlerLinks = 1;}
+			if (foulLinks == 1){
+				if (foulzaehlerLinks > 2){
+					aufnahmeHoehe -= 15;  punkte1 -= 15; foulLinks = 0; foulzaehlerLinks = 0;
+					logText = logText +" /-15F";
+				}else{
+					if (anstoss == 1){
+						punkte1 -= 2; foulLinks = 0; anstoss = 0;
+						logText = logText +" / Afstootfoul -2";
+					}else{
+						aufnahmeHoehe -= 1; punkte1 -= 1; foulLinks = 0;
+						logText = logText +" /-1F";
+					}
+				}
+			}else{
+				foulzaehlerLinks = 0;
+			}
+			punkte1 = punkte1 + punkte;
+			$("#linkerZaehler").text(punkte1);
+			if (aufnahmeHoehe > aufnahmeHoechsteL){aufnahmeHoechsteL = aufnahmeHoehe; }
+			spieleLog("Links"+ logText);
+			if (rest > 1){
+				spielerAktiv = 2; aufnahmeHoehe = 0;aufnahmeHoehe = 0;
+			}else{
+				if (punkte1 > 0){$("#statGdL").text((punkte1 / aufnahmen1).toFixed(1));}
+				ausblenden(15); aufnahmen1--;
+			}
+		}else{
+			if(aufnahmeHoehe > 0){foulzaehlerRechts = 0;}
+			if(aufnahmeHoehe > 0 && foulRechts == 1){foulzaehlerRechts = 1;}
+			if (foulRechts == 1){
+				if (foulzaehlerRechts > 2){
+					aufnahmeHoehe -= 15; punkte2 -= 15; foulRechts = 0; foulzaehlerRechts = 0;
+					logText = logText +" /-15F";
+				}else{
+					if (anstoss == 2){
+						punkte2 -= 2; foulRechts = 0; anstoss = 0;
+						logText = logText +" / Anstossfoul -2";
+					}else{
+						aufnahmeHoehe -= 1; punkte2 -= 1; foulRechts = 0;
+						logText = logText +" /-1F";
+					}
+				}
+			}else{
+				foulzaehlerRechts = 0; 
+			}
+			punkte2 = punkte2 + punkte;
+			$("#rechterZaehler").text(punkte2);
+			if (aufnahmeHoehe > aufnahmeHoechsteR){aufnahmeHoechsteR = aufnahmeHoehe; }
+			spieleLog("Rechts"+ logText);
+			if (rest > 1){
+				spielerAktiv = 1; aufnahmeHoehe = 0;aufnahmeHoehe = 0;
+			}else{
+				if (punkte2 > 0){$("#statGdR").text((punkte2 / aufnahmen2).toFixed(1));}
+				ausblenden(15); aufnahmen2--;
+			}
+		}
+		punkte = 0; anstoss = 0;
+		aufnahmeWechsel();
+		aktualisiereFoul();
+	}
+// ##### Aufnahme Wechsel #####
+	function aufnahmeWechsel(){
+		$('#rechterZaehler').fadeOut('slow');
+		$('#linkerZaehler').fadeOut('slow', function(){
+			if (spielerAktiv == 1){
+				aufnahmen1++;
+				$('#rBlock').css("background-color", "");$('#lBlock').css("background-color", "LightGreen");
+			}
+			if (spielerAktiv == 2){
+				aufnahmen2++;
+				$('#rBlock').css("background-color", "LightGreen");$('#lBlock').css("background-color", "");
+			} 
+			$('#rechterZaehler').fadeIn('slow');
+			$('#linkerZaehler').fadeIn('slow', function(){
+				if (punkte1 >= runTo){
+					$("#lblGewonnen").text("Links heeft GEWONNEN");
+					$("#popupGewonnen").popup("open");
+				}
+				if (punkte2 >= runTo){
+					$("#lblGewonnen").text("Rechts heeft GEWONNEN");
+					$("#popupGewonnen").popup("open");
+				}
+				$("#xZUy").html("Race naar : " + runTo + "<br>" + punkte1 +" : "+ punkte2);
+				$('#xZUy').css("text-align", "center");
+				aktualisiereStats();
+				$(window).resize();
+			})
+		})			
+	}
+// ##### Spielstart #####
+	function spielStart(){
+		stoppuhr = unixMs;
+		$('#btnBreakLinks').hide(); $('#btnBreakRechts').hide(); $('#pBtnFoul1').show(); $('#pBtnFoul2').show(); $('.Zaehler').show();
+		$('#btnSpielziel').show(); $('#btnPause').show(); $('#btnLog').show(); $('#btnEnde').show(); $('#statistikL').show(); $('#statistikR').show();
+		timerAusgabe = "00:00:00"
+		spieleLog('Nieuw spel gestart');
+		$('.timer').show();
+		}
+// ##### Weiter #####
+	function spielWeiter(){
+		stoppuhr = stoppuhr +(unixMs - pstoppuhr);
+		$('#btnWeiter').hide();
+		$('.timer').show();
+		$('#btnPause').show();
+		if (aufnahmen1 >= aufnahmen2){var test = aufnahmen1;}else{var test = aufnahmen2;}
+		spieleLog('Spel Hervat');
+		}
+// ##### Spiele Log ##### 
+	function spieleLog(aktion) {
+		var jetzt = new Date();
+		var log = {zeitstempel: jetzt.getTime(),
+				ereignis: aktion,
+				rBaelle: rest,
+				aufnahmenL: aufnahmen1,
+				aufnahmeHoeheL: aufnahmeHoechsteL,
+				foulzaehlerL: foulzaehlerLinks,
+				punkteL: punkte1,
+				punkteR: punkte2,
+				foulzaehlerR: foulzaehlerRechts,
+				aufnahmeHoeheR: aufnahmeHoechsteR,
+				aufnahmenR: aufnahmen2,
+				spielzeit: timerAusgabe};
+			localDB.add('spielelog', log);
+			localDB.add('spielelog2', log);
+		$( window ).resize();}
+// ##### Uhrzeit / Stoppuhr #####	
+	function DateTime(){
+		var jetzt = new Date();
+		unixMs = jetzt.getTime(); // Unixtime ms seit 1970 für Stoppuhr
+		$(".clock").text(jetzt.toLocaleTimeString());
+		// Stoppuhr
+		var unixtime2time = new Date(unixMs - stoppuhr);
+		var Std = unixtime2time. getUTCHours(); // getUTCHours - wichtig da Unixtime UTC ist 
+		var Min = unixtime2time.getMinutes();
+		var Sek = unixtime2time.getSeconds();
+		var StdAusgabe = ((Std < 10) ? "0" + Std : Std);
+		var MinAusgabe = ((Min < 10) ? "0" + Min : Min);
+		var SekAusgabe = ((Sek < 10) ? "0" + Sek : Sek);
+		timerAusgabe = StdAusgabe +":"+ MinAusgabe +":"+ SekAusgabe;
+		$(".timer").text(timerAusgabe);
+		//$(window).resize();
+	}
+</script> </head>
+  <body onload="setInterval(DateTime, 1000);">
+    <div id="Scoreboard" data-role="page">
+      <!-- Header -->
+      <div data-role="header" data-position="fixed">
+        <div class="ui-grid-b">
+          <div class="ui-block-a"><!-- linker Block -->
+            <div style="float:left;"> <a id="btnVollbildAus" onclick="$(document).fullScreen(false);"
+
+                href="#Scoreboard" class="ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-notext ui-icon-back">Back</a>
+            </div>
+            <div style="margin-top: 0.5em;"> <a class="" href="#popupSpWechseln"
+
+                data-transition="pop" data-rel="popup" data-position-to="window"><img
+
+                  id="btn8910" src="./img/8910Btn.svg" alt="8-9-10" height="30"
+
+                  width="60"></a> </div>
+          </div>
+          <!-- Ende linker Block -->
+          <div class="ui-block-b"><!-- mittel Block -->
+            <p id="startseiteHeader" align="center">14-1 SCOREBOARD</p>
+          </div>
+          <!-- Ende mittel Block -->
+          <div class="ui-block-c"><!-- rechter Block -->
+            <p class="clock" align="center"></p>
+            <a href="#Einstellungen" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-notext ui-icon-gear">Setup</a>
+          </div>
+          <!-- Ende rechter Block --> </div>
+        <!-- Ende grid-b --> </div>
+      <!-- /header -->
+      <!-- Content -->
+      <div data-role="content">
+        <div class="ui-grid-b" style="">
+          <style>
+				.ui-grid-b .ui-block-a {width: 40%;}
+				.ui-grid-b .ui-block-b {width: 20%;}
+				.ui-grid-b .ui-block-c {width: 40%;}
+			</style>
+          <!-- linker Block -->
+          <div id="lBlock" class="ui-block-a" style="background-color:;" align="center"><!-- linker Block -->
+            <p id="spielerNameL" style="font-size: 36px;font-weight: bold;margin-top: 0em;">
+            </p>
+            <p id="linkerZaehler" class="Zaehler" style="font-size: 160px;font-weight: bold;margin-top: -0.25em;">0</p>
+            <a id="btnBreakLinks" href="#" style="" class="ui-btn ui-btn-inline ui-corner-all">BREAK?</a>
+            <a id="pBtnFoul1" class="fButtons" href="#" data-role="button" data-inline="true"
+
+              style="margin-top:-0.3em;">FOUL+</a>
+            <div>
+              <table id="statistikL" style="width: 60%;border-collapse: collapse; margin-bottom:0.3em;">
+                <tbody>
+                </tbody>
+                <thead>
+                  <tr>
+                    <th>Aan Tafel</th>
+                    <th>Gem. Break</th>
+                    <th>Hoogste</th>
+                    <th>FOULS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td id="statAufnL">0</td>
+                    <td id="statGdL">0</td>
+                    <td id="statHoechsteL">0</td>
+                    <td id="foulZaehlerL">0</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <!-- Ende linker Block -->
+          <!-- mittel Block -->
+          <div class="ui-block-b" align="center"> <a id="btnVollbild" href="#"
+
+              class="mitteBtns ui-btn ui-btn-inline ui-corner-all ui-btn-icon-left ui-icon-power">Fullscreen</a><br>
+            <a id="btnSpielziel" href="#popupSpielziel" data-rel="popup" data-position-to="#startseiteHeader"
+
+              data-transition="pop" class="mitteBtns ui-btn ui-btn-inline ui-corner-all ui-btn-icon-left ui-icon-arrow-u-r">Race
+              naar...</a>
+            <h1 class="timer">00:00:00</h1>
+            <a id="btnPause" href="#" class="mitteBtns ui-btn ui-btn-inline ui-corner-all ui-btn-icon-left ui-icon-power">Pauze</a>
+            <a id="btnWeiter" href="#" class="mitteBtns ui-btn ui-btn-inline ui-corner-all ui-btn-icon-left ui-icon-power">Hervatten</a>
+            <a id="btnLog" href="#Log" class="mitteBtns ui-btn ui-btn-inline ui-corner-all ui-btn-icon-left ui-icon-power">Log
+              / Undo</a> <br>
+            <br>
+            <a id="btnEnde" href="#popupSpBeenden" data-rel="popup" data-position-to="window"
+
+              data-transition="pop" class="mitteBtns ui-btn ui-btn-inline ui-corner-all ui-btn-icon-left ui-icon-power">Stoppen</a>
+          </div>
+          <!-- Ende mittel Block -->
+          <!-- rechter Block -->
+          <div id="rBlock" class="ui-block-c" style="background-color:;" align="center">
+            <p id="spielerNameR" style="font-size: 36px;font-weight: bold;margin-top: 0em;">
+            </p>
+            <p id="rechterZaehler" class="Zaehler" style="font-size: 160px;font-weight: bold;margin-top: -0.25em;">0</p>
+            <a id="btnBreakRechts" href="#" style="" class="ui-btn ui-btn-inline ui-corner-all">BREAK?</a>
+            <a id="pBtnFoul2" class="fButtons" href="#" data-role="button" data-inline="true"
+
+              style="margin-top:-0.3em;">FOUL+</a>
+            <div>
+              <table id="statistikR" style="width: 60%;border-collapse: collapse; margin-bottom:0.3em;">
+                <tbody>
+                </tbody>
+                <thead>
+                  <tr>
+                    <th>Aan Tafel</th>
+                    <th>Gem.Break</th>
+                    <th>Hoogste</th>
+                    <th>FOULS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td id="statAufnR">0</td>
+                    <td id="statGdR">0</td>
+                    <td id="statHoechsteR">0</td>
+                    <td id="foulZaehlerR">0</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <!-- Ende rechter Block --> </div>
+        <!-- Ende grid-b --> </div>
+      <!-- /content -->
+      <!-- /Footer-->
+      <div data-role="footer" data-position="fixed"> <img id="1Ball" class="Baelle"
+
+          style="" src="./img/1B.svg" alt="1"> <img id="2Ball" class="Baelle" style=""
+
+          src="./img/2B.svg" alt="2"> <img id="3Ball" class="Baelle" style="" src="./img/3B.svg"
+
+          alt="3"> <img id="4Ball" class="Baelle" style="" src="./img/4B.svg" alt="4">
+        <img id="5Ball" class="Baelle" style="" src="./img/5B.svg" alt="5"> <img
+
+          id="6Ball" class="Baelle" style="" src="./img/6B.svg" alt="6"> <img id="7Ball"
+
+          class="Baelle" style="" src="./img/7B.svg" alt="7"> <img id="8Ball" class="Baelle"
+
+          style="" src="./img/8B.svg" alt="8"> <img id="9Ball" class="Baelle" style=""
+
+          src="./img/9B.svg" alt="9"> <img id="10Ball" class="Baelle" style=""
+
+          src="./img/10B.svg" alt="10"> <img id="11Ball" class="Baelle" style=""
+
+          src="./img/11B.svg" alt="11"> <img id="12Ball" class="Baelle" style=""
+
+          src="./img/12B.svg" alt="12"> <img id="13Ball" class="Baelle" style=""
+
+          src="./img/13B.svg" alt="13"> <img id="14Ball" class="Baelle" style=""
+
+          src="./img/14B.svg" alt="14"> <img id="15Ball" class="Baelle" style=""
+
+          src="./img/15B.svg" alt="15"> </div>
+      <!-- /footer -->
+      <!-- /Popup Spielziel-->
+      <div data-role="popup" id="popupSpielziel" data-overlay-theme="b" data-theme="b"
+
+        data-dismissible="false" style="max-width:400px;">
+        <div data-role="header" data-theme="a">
+          <h1>Race naar?</h1>
+        </div>
+        <div role="main" class="ui-content">
+          <h3>Geef hier de winstvoorwaarde in (bv. 125).</h3>
+          <form style="margin-top: -2em;"> &nbsp;&nbsp;&nbsp;&nbsp; <input data-clear-btn="true"
+
+              name="runTo" id="inpRunTo" value="60" step="5" style="font-size: 36px;font-weight: bold;"
+
+              type="number"> </form>
+          <a id="btnSpZielZurueck" href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b"
+
+            data-rel="back">Bevestigen</a> </div>
+      </div>
+      <!-- /Popup Spiel gewonnen-->
+      <div data-role="popup" id="popupGewonnen" data-overlay-theme="b" data-theme="b"
+
+        data-dismissible="false" style="width:500px;"> &nbsp;&nbsp;&nbsp;&nbsp;
+        <div data-role="header" data-theme="a" style="background: #00ff00;">
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          <h1 id="lblGewonnen">&gt;&gt; GEWONNEN!!!</h1>
+        </div>
+        <div>
+          <p id="xZUy"></p>
+        </div>
+        <div> <a id="popSpielZurueck" href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b"
+
+            data-rel="back" data-transition="flow" data-icon="back">Terug</a> </div>
+        <script>
+			//$('#berichtPunkteL').text(punkte1);
+			//$('#berichtAufnL').text(aufnahmen1);
+			//$('#berichtHoechsteL').text(aufnahmeHoechsteL);
+			//$('#berichtGdL').text(punkte1 / aufnahmen1);
+		</script> </div>
+      <!-- /Popup Spiel Beenden-->
+      <div data-role="popup" id="popupSpBeenden" data-overlay-theme="b" data-theme="b"
+
+        data-dismissible="false" style="max-width:400px;">
+        <div data-role="header" data-theme="a">
+          <h1>Spel Beëindigen?</h1>
+        </div>
+        <div role="main" class="ui-content">
+          <h3>Weet je zeker dat je het spel wil stoppen?</h3>
+          <p>Dit kan niet meer ongedaan gemaakt worden!</p>
+          <p></p>
+          <a id="btnSpBZurueck" href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b"
+
+            data-rel="back">Terug</a> <a id="btnSpBeenden" href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b"
+
+            data-rel="back" data-transition="flow">Stoppen</a> </div>
+      </div>
+      <!-- /Popup Wechsel zu 8-9-10Ball-->
+      <div id="popupSpWechseln" style="max-width:1000px;" data-role="popup" data-theme="b"
+
+        data-overlay-theme="b" data-dismissible="false">
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <div data-role="header" data-theme="a"> &nbsp;&nbsp;&nbsp;&nbsp;
+          <h1>Naar 8-9-10 Ball Scoreboard</h1>
+          &nbsp;&nbsp;&nbsp;&nbsp;</div>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <div class="ui-content" role="main">
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <p class="ui-title">Weet je zeker dat je het spel wil beeïndigen en
+            over wil naar het 8-9-10 Ball Scoreboard?</p>
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          <p class="ui-title"></p>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b"
+
+            href="#" data-rel="back">Terug</a>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b"
+
+            href="file:///C:/Users/Dell%20Latitude%20E5570/Desktop/14-1%20app/scoreboard8910.html"
+
+            rel="external" data-transition="flow">Naar 8-9-10 Ball Scoreboard</a>
+          &nbsp;&nbsp;&nbsp;&nbsp;</div>
+      </div>
+    </div>
+    <!-- /Hauptpage ENDE-->
+    <!-- /Ab hier beginnt die zweite Seite: Einstellungen -->
+    <div data-role="page" id="Einstellungen" data-position="fixed">
+      <div data-role="header">
+        <h1>Scoreboard Instellingen</h1>
+        &nbsp;&nbsp;&nbsp;&nbsp; <a href="#Scoreboard" class="btnLogZurueck ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-notext ui-icon-back">Terug</a>
+        &nbsp;&nbsp;&nbsp;&nbsp; <a href="#Scoreboard" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-mini ui-corner-all ui-btn-icon-notext ui-icon-check">Opslaan</a>
+      </div>
+      <!-- /header -->
+      <div data-role="content">
+        <h1>Instellingen</h1>
+        <a id="btnLogsLoeschen" href="#Scoreboard" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b"
+
+          data-rel="back" data-transition="flow">ALLE LOG's Wissen (Geen UNDO
+          meer mogelijk!)</a> <a id="btnLog2" href="#Log" style="" class="ui-btn ui-btn-inline ui-corner-all">LOG</a>
+      </div>
+      <!-- /content -->
+      <div data-role="footer" data-position="fixed"> <a href="#Scoreboard" class="btnLogZurueck ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-notext ui-icon-back">Back</a>
+        <p id="footerText" align="center">Instellingen</p>
+        &nbsp;&nbsp;&nbsp;&nbsp; <a href="#Scoreboard" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-mini ui-corner-all ui-btn-icon-notext ui-icon-check">Save</a>
+      </div>
+      <!-- /footer --> </div>
+    <!-- /page -->
+    <!-- /Ab hier beginnt die dritte Seite: LOG -->
+    <div data-role="page" id="Log" data-theme="a" data-position="fixed" data-fullscreen="true">
+      <div data-role="header" data-position="fixed">
+        <h1>LOG</h1>
+        <a class="btnLogZurueck" href="#Scoreboard" data-role="button" data-inline="true"
+
+          data-mini="true" data-icon="back">Terug</a> </div>
+      <!-- /header -->
+      <div data-role="content"> <a id="btnUndo" href="" data-role="button" data-inline="true"
+
+          data-mini="true" data-icon="back">UNDO (Laatste ingave)</a>
+        <table id="logTable" style="background: LemonChiffon;width: 90%;border-collapse: collapse;">
+          <caption>LOG Overzicht</caption>
+          <thead>
+            <tr>
+              <th>Tijd</th>
+              <th>Gebeurtenis</th>
+              <th>Op tafel</th>
+              <th>BeurtenL</th>
+              <th>HoogsteL</th>
+              <th>FoulsL</th>
+              <th>Stand</th>
+              <th>FoulsR</th>
+              <th>HoogsteR</th>
+              <th>BeurtenR</th>
+              <th>Timer</th>
+            </tr>
+          </thead>
+          <tfoot>
+            <tr>
+              <th>Tijd</th>
+              <th>Gebeurtenis</th>
+              <th>Op tafel</th>
+              <th>BeurtenL</th>
+              <th>HoogsteL</th>
+              <th>FoulsL</th>
+              <th>Stand</th>
+              <th>FoulsR</th>
+              <th>HoogsteR</th>
+              <th>BeurtenR</th>
+              <th>Timer</th>
+            </tr>
+          </tfoot>
+          <tbody id="logBody">
+            <tr>
+            </tr>
+          </tbody>
+        </table>
+        <p id="liste"></p>
+        <p align="right">14-1 Scoreboard</p>
+      </div>
+      <!-- /content ende-->
+      <div data-role="footer"> <a class="btnLogZurueck" href="#Scoreboard" data-role="button"
+
+          data-inline="true" data-mini="true" data-icon="back">Terug</a> </div>
+      <!-- /footer ende--> </div>
+    <!-- /page history ende -->
+  </body>
+</html>

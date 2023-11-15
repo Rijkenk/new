@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>Billard-live.org Scoreboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <script src="jquery.fullscreen-min.js"></script>
+    <script src="localDB.min.js"></script>
+    <script>
+//Initialisierung
+	var punkte1 = 0; var punkte2 = 0;
+	var stoppuhr = 0; var pstoppuhr = 0; var wstoppuhr = 0;
+	localDB.schema('spielelog', ['zeitstempel', 'ereignis', 'zSpieler1','zSpieler2', 'spielzeit']); // DB Tabelle definieren
+	$("#linkerZaehler").text(punkte1);
+	$("#rechterZaehler").text(punkte2);
+	
+	$(document).ready(function(){
+		$('.timer').hide(); $('#btnWeiter').hide(); $('#btnPause').hide(); $('#btnSave').hide();$('#btnEnde').hide();
+		$("#linkerZaehler").text(punkte1); $("#rechterZaehler").text(punkte2);
+		$(function(){
+		$('#btnVollbild').on( "vclick", function(){
+			$('#btnVollbild').hide();
+			$(document).fullScreen(true);})	
+		$('#linkerZaehler').on( "vclick", function(){
+			if ($('#btnTimer').is(':visible')){spielStart();}
+			if ($('#btnWeiter').is(':visible')){spielWeiter();}
+			$('#linkerZaehler').fadeOut('slow', function() {
+				punkte1++;
+				$("#linkerZaehler").text(punkte1);
+				$('#linkerZaehler').fadeIn('slow');
+				spieleLog('Spieler links +1', punkte1, punkte2, timerAusgabe);})})
+		$('#pBtnLinkerZaehler').on( "vclick", function(){
+			if ($('#btnTimer').is(':visible')){spielStart();}
+			if ($('#btnWeiter').is(':visible')){spielWeiter();}
+			$('#linkerZaehler').fadeOut('slow', function() {
+				punkte1++;
+				$("#linkerZaehler").text(punkte1);
+				$('#linkerZaehler').fadeIn('slow');
+				spieleLog('Spieler links +1', punkte1, punkte2, timerAusgabe);})})
+		$('#mBtnLinkerZaehler').on( "vclick", function(){
+			if ($('#btnTimer').is(':visible')){spielStart();}
+			if ($('#btnWeiter').is(':visible')){spielWeiter();}
+			$('#linkerZaehler').fadeOut('slow', function() {
+				punkte1--;
+				$("#linkerZaehler").text(punkte1);
+				$('#linkerZaehler').fadeIn('slow');
+				spieleLog('Spieler links -1', punkte1, punkte2, timerAusgabe);})})
+		$('#rechterZaehler').on( "vclick", function(){
+			if ($('#btnTimer').is(':visible')){spielStart();}
+			if ($('#btnWeiter').is(':visible')){spielWeiter();}
+			$('#rechterZaehler').fadeOut('slow', function() {
+				punkte2++;
+				$("#rechterZaehler").text(punkte2);
+				$('#rechterZaehler').fadeIn('slow');
+				spieleLog('Spieler rechts +1', punkte1, punkte2, timerAusgabe);})})
+		$('#pBtnRechterZaehler').on( "vclick", function(){
+			if ($('#btnTimer').is(':visible')){spielStart();}
+			if ($('#btnWeiter').is(':visible')){spielWeiter();}
+			$('#rechterZaehler').fadeOut('slow', function() {
+				punkte2++;
+				$("#rechterZaehler").text(punkte2);
+				$('#rechterZaehler').fadeIn('slow');
+				spieleLog('Spieler rechts +1', punkte1, punkte2, timerAusgabe);})})
+		$('#mBtnRechterZaehler').on( "vclick", function(){
+			if ($('#btnTimer').is(':visible')){spielStart();}
+			if ($('#btnWeiter').is(':visible')){spielWeiter();}
+			$('#rechterZaehler').fadeOut('slow', function() {
+				punkte2--;
+				$("#rechterZaehler").text(punkte2);
+				$('#rechterZaehler').fadeIn('slow');
+				spieleLog('Spieler rechts -1', punkte1, punkte2, timerAusgabe);})})
+		$('#btnSave').on( "vclick", function(){
+			if($("#verlauf").text() == "-"){
+				$("#verlauf").text("Sets: "+ punkte1 + " : " + punkte2);}
+			else{
+				inhaltTxt = $("#verlauf").text();
+				$("#verlauf").text(inhaltTxt + "  /  "+ punkte1 + " : " + punkte2);
+			}
+			$('#linkerZaehler').fadeOut('slow');
+			$('#rechterZaehler').fadeOut('slow',function(){
+				spieleLog('Neuer Satz bei', punkte1, punkte2, timerAusgabe);
+				punkte1 = 0; punkte2 = 0;
+				$("#linkerZaehler").text(punkte1);
+				$("#rechterZaehler").text(punkte2);
+				$('#rechterZaehler').fadeIn('slow');
+				$('#linkerZaehler').fadeIn('slow');
+				$( window ).resize();})})
+		// ##### Stoppuhr #####
+		$('#btnTimer').on( "vclick", function(){  // Spielstart
+			spielStart();
+		});
+		$('.timer').on( "vclick", function(){ // Pause
+			$('#btnPause').hide();
+			pstoppuhr = unixMs;
+			$('#btnWeiter').show();
+			spieleLog('Spiel Pause', punkte1, punkte2, timerAusgabe);
+		});
+		$('#btnPause').on( "vclick", function(){ 	// Pause
+			$('#btnPause').hide();
+			$('.timer').hide();
+			pstoppuhr = unixMs;
+			$('#btnWeiter').show();
+			spieleLog('Spiel Pause', punkte1, punkte2, timerAusgabe);
+		});	
+		$('#btnWeiter').on( "vclick", function(){ 	// Weiter
+			spielWeiter();
+		});
+		$('#btnSpBeenden').on( "vclick", function(){ 	
+			if($("#verlauf").text() == "-"){
+				$("#verlauf").text("Sätze: "+ punkte1 + ":" + punkte2);}
+			else{
+				inhaltTxt = $("#verlauf").text();
+				$("#verlauf").text(inhaltTxt + "  /  "+ punkte1 + ":" + punkte2);
+			}
+			$('.timer').hide();
+			$('#btnWeiter').hide();
+			$('#btnTimer').show();
+			$('#btnEnde').hide();
+			$('#btnPause').hide();
+			$('#btnSave').hide();
+			spieleLog('Spiel Ende', punkte1, punkte2, timerAusgabe);
+			$('#linkerZaehler').fadeOut('slow');
+			$('#rechterZaehler').fadeOut('slow',function(){
+				punkte1 = 0; punkte2 = 0;
+				$("#linkerZaehler").text(punkte1);
+				$("#rechterZaehler").text(punkte2);
+				$( window ).resize();
+				$('#rechterZaehler').fadeIn('slow');
+				$('#linkerZaehler').fadeIn('slow');
+			stoppuhr = 0; pstoppuhr = 0; wstoppuhr = 0;
+			location.href = ("#seite01");		//Zurück auf Seite01 springen
+		})})
+		$('#btnLog').on( "vclick", function(){ 			
+			var cursor = localDB.findAll('spielelog');
+			var logdata = cursor.fetch();
+			for (var i = cursor.count() - 1; i >= 0; i--){
+				if(unixMs - logdata[i].zeitstempel > 86400000){
+					db.remove('spielelog', {'zeitstempel': "'"+logdata[i].zeitstempel+"'"});
+				}
+				d = new Date(logdata[i].zeitstempel);
+				$("#liste").append(d.toLocaleString() +" | "+ logdata[i].ereignis +" | "+ logdata[i].zSpieler1 +":"+ logdata[i].zSpieler2 +" | "+ logdata[i].spielzeit);
+				$("#liste").append('<br>');
+				//v1 = logdata[i].zeitstempel;
+				//v2 = logdata[i].ereignis;
+				//v3 = logdata[i].zSpieler1;
+				//v4 = logdata[i].zSpieler2;
+				//v5 = logdata[i].spielzeit;
+				//console.log(v1 +", "+ v2 +", "+ v3 +", "+ v4 +", "+ v5);
+			}	
+		})
+		$('#btnLoeschen').on( "vclick", function(){ 	
+			$("#liste").text('');
+			localDB.empty('spielelog');
+		});
+		$( window ).resize(function(){
+			if ($(document).fullScreen() == false){$('#btnVollbild').show();}
+			viewPortHeight = $(window).height();
+			headerHeight = $('div[data-role="header"]').height();
+			footerHeight = $('div[data-role="footer"]').height();
+			contentHeight = viewPortHeight - headerHeight - footerHeight;
+			$(".Zaehler").css("font-size",contentHeight*0.9);
+			$(".Zaehler").css("margin-top","-0.25em");
+			$(".Zaehler").css("margin-bottom","-0.25em");
+			if (punkte1 > 9 || punkte2 > 9){
+				$(".Zaehler").css("font-size",contentHeight*0.6);
+				$(".Zaehler").css("margin-top","-0.2em");
+				$(".Zaehler").css("margin-bottom","-0.25em");}
+			if (punkte1 > 99 || punkte2 > 99){
+				$(".Zaehler").css("font-size",contentHeight*0.4);
+				$(".Zaehler").css("margin-top","0em");}
+				$(".Zaehler").css("margin-bottom","-0.25em");
+			screenWidth = $(document).width();
+			$(".mitteBtns").css("width",screenWidth*0.08 + 'px');
+			viewPortHeight = $(window).height();
+			headerHeight = $('div[data-role="header"]').height();
+			footerHeight = $('div[data-role="footer"]').height();
+			contentHeight = viewPortHeight - headerHeight - footerHeight - 50;
+			$('.page-content').css("height", contentHeight + 'px');
+		})
+		$( window ).resize();
+		
+	})});
+	// ##### Spielstart #####
+	function spielStart(){
+		stoppuhr = unixMs;
+		$('#btnTimer').hide();
+		$('#btnPause').show();
+		$('#btnSave').show();
+		$('#btnEnde').show();
+		spieleLog('Neues Spiel Start', punkte1, punkte2, "00:00:00");
+		$("#verlauf").text("-");
+		$('.timer').show();
+		}
+// ##### Weiter #####
+	function spielWeiter(){
+		stoppuhr = stoppuhr +(unixMs - pstoppuhr);
+		$('#btnWeiter').hide();
+		$('.timer').show();
+		$('#btnPause').show();
+		spieleLog('Spiel Weiter', punkte1, punkte2, timerAusgabe);
+		}
+// ##### Spiele Log ##### 
+	function spieleLog(aktion, spielstandS1, spielstandS2, zspielzeit) {
+		//localDB.schema('spielelog', ['zeitstempel', 'ereignis', 'zSpieler1','zSpieler2', 'spielzeit']);
+		var log = {zeitstempel: unixMs,
+					ereignis: aktion,
+					zSpieler1: spielstandS1,
+					zSpieler2: spielstandS2,
+					spielzeit: zspielzeit
+                    };
+        localDB.add('spielelog', log);
+		$( window ).resize();
+    }
+	function DateTime(){	// aktuelle Zeit anzeigen / aktualisieren
+		var jetzt = new Date();
+		unixMs = jetzt.getTime(); // Unixtime ms seit 1970 für Stoppuhr
+		$(".clock").text(jetzt.toLocaleTimeString());
+		// Stoppuhr
+		var unixtime2time = new Date(unixMs - stoppuhr);
+		var Std = unixtime2time. getUTCHours(); // getUTCHours - wichtig da Unixtime UTC ist 
+		var Min = unixtime2time.getMinutes();
+		var Sek = unixtime2time.getSeconds();
+		var StdAusgabe = ((Std < 10) ? "0" + Std : Std);
+		var MinAusgabe = ((Min < 10) ? "0" + Min : Min);
+		var SekAusgabe = ((Sek < 10) ? "0" + Sek : Sek);
+		timerAusgabe = StdAusgabe +":"+ MinAusgabe +":"+ SekAusgabe;
+		$(".timer").text(timerAusgabe);
+	}
+</script> </head>
+  <body onload="setInterval(DateTime, 1000);">
+    <div data-role="page" id="Scoreboard">
+      <div data-role="header" data-position="fixed">
+        <div class="ui-grid-b">
+          <div class="ui-block-a"><!-- linker Block -->
+            <div style="float:left;"> <a id="btnVollbildAus" onclick="$(document).fullScreen(false);"
+
+                href="#Scoreboard" class="ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-notext ui-icon-back">Back</a>
+            </div>
+            <div style="margin-top: 0.5em;"> <a class="" href="#popupSpWechseln"
+
+                data-transition="pop" data-rel="popup" data-position-to="window"><img
+
+                  id="14Ball" src="img/14-1Btn.svg" alt="14-1" height="30" width="60"></a>
+            </div>
+          </div>
+          <!-- Ende linker Block -->
+          <div class="ui-block-b"><!-- mittel Block -->
+            <p id="startseiteHeader" align="center">SCOREBOARD</p>
+          </div>
+          <!-- Ende mittel Block -->
+          <div class="ui-block-c"><!-- rechter Block -->
+            <p class="clock" align="center"></p>
+            <a href="#Einstellungen" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-notext ui-icon-gear">Setup</a>
+          </div>
+          <!-- Ende rechter Block --> </div>
+        <!-- Ende grid-b --> </div>
+      <!-- /header -->
+      <div data-role="content">
+        <div class="ui-grid-b" style="">
+          <div class="ui-block-a" align="center"><!-- linker Block -->
+            <p id="linkerZaehler" class="Zaehler" style="font-size: 200px;font-weight: bold;margin-top: -0.25em;">0</p>
+            <a id="pBtnLinkerZaehler" href="#" data-role="button" data-inline="true"
+
+              data-mini="true" data-icon="forward">+</a> <a id="mBtnLinkerZaehler"
+
+              href="#" data-role="button" data-inline="true" data-mini="true" data-icon="back">-</a>
+          </div>
+          <!-- Ende linker Block -->
+          <div class="ui-block-b" align="center"><!-- mittel Block --> <a id="btnVollbild"
+
+              href="#" style="" class="mitteBtns ui-btn ui-btn-inline ui-corner-all ui-btn-icon-left ui-icon-power">Fullscreen</a><br>
+            <a id="btnTimer" href="#" class="mitteBtns ui-btn ui-btn-inline ui-corner-all ui-btn-icon-left ui-icon-power">Start</a>
+            <h1 class="timer">00:00:00</h1>
+            <a id="btnPause" href="#" class="mitteBtns ui-btn ui-btn-inline ui-corner-all ui-btn-icon-left ui-icon-power">Pauze</a>
+            <a id="btnWeiter" href="#" class="mitteBtns ui-btn ui-btn-inline ui-corner-all ui-btn-icon-left ui-icon-power">Hervatten</a>
+            <br>
+            <br>
+            <a id="btnSave" href="#" style="" class="mitteBtns ui-btn ui-btn-inline ui-corner-all ui-btn-icon-left ui-icon-power">Nieuwe
+              Set</a><br>
+            <a id="btnEnde" href="#popupSpBeenden" data-rel="popup" data-position-to="window"
+
+              data-transition="pop" class="mitteBtns ui-btn ui-btn-inline ui-corner-all ui-btn-icon-left ui-icon-power">Stoppen</a>
+          </div>
+          <!-- Ende mittel Block -->
+          <div class="ui-block-c" align="center"><!-- rechter Block -->
+            <p id="rechterZaehler" class="Zaehler" style="font-size: 200px;font-weight: bold;margin-top: -0.25em;">0</p>
+            <a id="pBtnRechterZaehler" href="#" data-role="button" data-inline="true"
+
+              data-mini="true" data-icon="forward">+</a> <a id="mBtnRechterZaehler"
+
+              href="#" data-role="button" data-inline="true" data-mini="true" data-icon="back">-</a>
+          </div>
+          <!-- Ende rechter Block --> </div>
+        <!-- Ende grid-b --> </div>
+      <!-- /content -->
+      <div data-role="footer" data-position="fixed">
+        <p id="verlauf" align="center">-</p>
+      </div>
+      <!-- /footer -->
+      <!-- /Popup Spiel Beenden-->
+      <div data-role="popup" id="popupSpBeenden" data-overlay-theme="b" data-theme="b"
+
+        data-dismissible="false" style="max-width:400px;">
+        <div data-role="header" data-theme="a">
+          <h1>Spel Beëindigen?</h1>
+        </div>
+        <div role="main" class="ui-content">
+          <h3>Daadwerkelijk het spel beëindigen?</h3>
+          <p>Dit kan niet ongedaan gemaakt worden!</p>
+          <p>Voor een nieuwe Set ga je terug en druk op "Nieuwe Set".</p>
+          <a id="btnSpBZurueck" href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b"
+
+            data-rel="back">Terug</a> <a id="btnSpBeenden" href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b"
+
+            data-rel="back" data-transition="flow">Beëindigen</a> </div>
+      </div>
+      <!-- /Popup Wechsel zu 14-1-->
+      <div id="popupSpWechseln" style="max-width:1000px;" data-role="popup" data-theme="b"
+
+        data-overlay-theme="b" data-dismissible="false">
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <div data-role="header" data-theme="a"> &nbsp;&nbsp;&nbsp;&nbsp;
+          <h1>Naar 14-1 Scoreboard</h1>
+          &nbsp;&nbsp;&nbsp;&nbsp;</div>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <div class="ui-content" role="main">
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <p class="ui-title">Spel beëindigen en naar het 14-1 Scoreboard?</p>
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          <p class="ui-title"></p>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b"
+
+            href="#" data-rel="back">Terug</a>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b"
+
+            href="file:///C:/Users/Dell%20Latitude%20E5570/Desktop/14-1%20app/14-1scoreboard.html"
+
+            rel="external" data-transition="flow">Naar 14-1 Scoreboard</a>
+          &nbsp;&nbsp;&nbsp;&nbsp;</div>
+      </div>
+    </div>
+    <!-- /page -->
+    <!-- /Ab hier beginnt die zweite Seite: Einstellungen -->
+    <div data-role="page" id="Einstellungen" data-position="fixed">
+      <div data-role="header">
+        <h1>Scoreboard Instellingen</h1>
+        &nbsp;&nbsp;&nbsp;&nbsp; <a href="#Scoreboard" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-notext ui-icon-back">Back</a>
+        &nbsp;&nbsp;&nbsp;&nbsp; <a href="#Scoreboard" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-mini ui-corner-all ui-btn-icon-notext ui-icon-check">Save</a>
+      </div>
+      <!-- /header -->
+      <div data-role="content">
+        <h1>Instellingen</h1>
+      </div>
+      <!-- /content -->
+      <div data-role="footer" data-position="fixed"> <a href="#Scoreboard" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-notext ui-icon-back">Back</a>
+        <p id="footerText" align="center">Instellingen</p>
+        &nbsp;&nbsp;&nbsp;&nbsp; <a href="#Scoreboard" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-mini ui-corner-all ui-btn-icon-notext ui-icon-check">Save</a>
+      </div>
+      <!-- /footer --> </div>
+    <!-- /page -->
+    <!-- /Ab hier beginnt die dritte Seite: LOG -->
+    <div data-role="page" id="Log" data-theme="a" data-position="fixed" data-fullscreen="true">
+      <div data-role="header" data-position="fixed">
+        <h1>LOG</h1>
+        <a href="#Scoreboard" onclick="$('#liste').text('')" data-role="button"
+
+          data-inline="true" data-mini="true" data-icon="back">Terug</a> </div>
+      <!-- /header -->
+      <div data-role="content">
+        <p id="liste"></p>
+      </div>
+      <!-- /content ende-->
+      <div data-role="footer"> <a href="#Scoreboard" onclick="$('#liste').text('')"
+
+          data-role="button" data-inline="true" data-mini="true" data-icon="back">Terug</a>
+      </div>
+      <!-- /footer ende--> </div>
+    <!-- /page history ende -->
+  </body>
+</html>
