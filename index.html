@@ -2,11 +2,11 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
-    <title>ScoreKeeper 14-1</title>
+    <title>14-1 Scoreboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="jquery.mobile-1.4.5.min.css">
-    <script src="jquery-2.1.4.min.js"></script>
-    <script src="jquery.mobile-1.4.5.min.js"></script>
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
     <script src="jquery.fullscreen-min.js"></script>
     <script src="localDB.min.js"></script>
     <style>
@@ -916,13 +916,11 @@ $(document).on("pageshow","#Scoreboard",function(){ // Wenn Page #Scoreboard gel
 			$('#rechterZaehler').fadeIn('slow');
 			$('#linkerZaehler').fadeIn('slow', function(){
 				if (punkte1 >= runTo){
-				{var playerNameL = $('#playerNameInputL').val();
-  $("#lblGewonnen").text(playerNameL + " heeft GEWONNEN");
+					$("#lblGewonnen").text("Links heeft GEWONNEN");
 					$("#popupGewonnen").popup("open");
 				}
-				if (punkte2 >= runTo)
-				{var playerNameR = $('#playerNameInputR').val();
-  $("#lblGewonnen").text(playerNameR + " heeft GEWONNEN");
+				if (punkte2 >= runTo){
+					$("#lblGewonnen").text("Rechts heeft GEWONNEN");
 					$("#popupGewonnen").popup("open");
 				}
 				$("#xZUy").html("Race naar : " + runTo + "<br>" + punkte1 +" : "+ punkte2);
@@ -987,8 +985,7 @@ $(document).on("pageshow","#Scoreboard",function(){ // Wenn Page #Scoreboard gel
 	}
 </script> </head>
   <body onload="setInterval(DateTime, 1000);">
-    <div id="Scoreboard" data-role="page">
-      <!-- Header -->
+    <div id="Scoreboard" data-role="page"> <!-- Header -->
       <div data-role="header" data-position="fixed">
         <div class="ui-grid-b">
           <div class="ui-block-a"><!-- linker Block -->
@@ -1026,7 +1023,7 @@ $(document).on("pageshow","#Scoreboard",function(){ // Wenn Page #Scoreboard gel
 			</style>
           <!-- linker Block -->
           <div id="lBlock" class="ui-block-a" style="background-color:;" align="center"><!-- linker Block -->
-			    <!-- Textbox for entering name -->
+			  <!-- Textbox for entering name -->
   <input type="text" id="playerNameInput" placeholder="Enter Name" style="font-size: 16px; padding: 0.3em; margin-bottom: 0.5em; width: 80%; text-align: center;">
             <p id="spielerNameL" style="font-size: 36px;font-weight: bold;margin-top: 0em;">
             </p>
@@ -1080,7 +1077,7 @@ $(document).on("pageshow","#Scoreboard",function(){ // Wenn Page #Scoreboard gel
           <!-- Ende mittel Block -->
           <!-- rechter Block -->
           <div id="rBlock" class="ui-block-c" style="background-color:;" align="center">
-			    <!-- Textbox for entering name -->
+			  <!-- Textbox for entering name -->
   <input type="text" id="playerNameInput" placeholder="Enter Name" style="font-size: 16px; padding: 0.3em; margin-bottom: 0.5em; width: 80%; text-align: center;">
             <p id="spielerNameR" style="font-size: 36px;font-weight: bold;margin-top: 0em;">
             </p>
@@ -1220,7 +1217,7 @@ $(document).on("pageshow","#Scoreboard",function(){ // Wenn Page #Scoreboard gel
             href="#" data-rel="back">Terug</a>
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b"
 
-            href="scoreboard8910.html"
+            href="file:///C:/Users/Dell%20Latitude%20E5570/Desktop/14-1%20app/scoreboard8910.html"
 
             rel="external" data-transition="flow">Naar 8-9-10 Ball Scoreboard</a>
           &nbsp;&nbsp;&nbsp;&nbsp;</div>
