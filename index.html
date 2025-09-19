@@ -916,11 +916,11 @@ $(document).on("pageshow","#Scoreboard",function(){ // Wenn Page #Scoreboard gel
 			$('#rechterZaehler').fadeIn('slow');
 			$('#linkerZaehler').fadeIn('slow', function(){
 				if (punkte1 >= runTo){
-					$("#lblGewonnen").text(spielerNameL "heeft GEWONNEN");
+					$("#lblGewonnen").text(playerNameInputL "heeft GEWONNEN");
 					$("#popupGewonnen").popup("open");
 				}
 				if (punkte2 >= runTo){
-					$("#lblGewonnen").text(spielerNameL "heeft GEWONNEN");
+					$("#lblGewonnen").text(playerNameInputR "heeft GEWONNEN");
 					$("#popupGewonnen").popup("open");
 				}
 				$("#xZUy").html("Race naar : " + runTo + "<br>" + punkte1 +" : "+ punkte2);
