@@ -916,11 +916,11 @@ $(document).on("pageshow","#Scoreboard",function(){ // Wenn Page #Scoreboard gel
 			$('#rechterZaehler').fadeIn('slow');
 			$('#linkerZaehler').fadeIn('slow', function(){
 				if (punkte1 >= runTo){
-					$("#lblGewonnen").text("Links heeft GEWONNEN");
+					$("#lblGewonnen").text(spielernameL "heeft GEWONNEN");
 					$("#popupGewonnen").popup("open");
 				}
 				if (punkte2 >= runTo){
-					$("#lblGewonnen").text("Rechts heeft GEWONNEN");
+					$("#lblGewonnen").text(spielernameL "heeft GEWONNEN");
 					$("#popupGewonnen").popup("open");
 				}
 				$("#xZUy").html("Race naar : " + runTo + "<br>" + punkte1 +" : "+ punkte2);
@@ -1025,7 +1025,7 @@ $(document).on("pageshow","#Scoreboard",function(){ // Wenn Page #Scoreboard gel
           <!-- linker Block -->
           <div id="lBlock" class="ui-block-a" style="background-color:;" align="center"><!-- linker Block -->
 			    <!-- Textbox for entering name -->
-  <input type="text" id="playerNameInput" placeholder="Enter Name" style="font-size: 16px; padding: 0.3em; margin-bottom: 0.5em; width: 80%; text-align: center;">
+  <input type="text" id="playerNameInputL" placeholder="Enter Name" style="font-size: 16px; padding: 0.3em; margin-bottom: 0.5em; width: 80%; text-align: center;">
             <p id="spielerNameL" style="font-size: 36px;font-weight: bold;margin-top: 0em;">
             </p>
             <p id="linkerZaehler" class="Zaehler" style="font-size: 160px;font-weight: bold;margin-top: -0.25em;">0</p>
@@ -1079,7 +1079,7 @@ $(document).on("pageshow","#Scoreboard",function(){ // Wenn Page #Scoreboard gel
           <!-- rechter Block -->
           <div id="rBlock" class="ui-block-c" style="background-color:;" align="center">
 			    <!-- Textbox for entering name -->
-  <input type="text" id="playerNameInput" placeholder="Enter Name" style="font-size: 16px; padding: 0.3em; margin-bottom: 0.5em; width: 80%; text-align: center;">
+  <input type="text" id="playerNameInputR" placeholder="Enter Name" style="font-size: 16px; padding: 0.3em; margin-bottom: 0.5em; width: 80%; text-align: center;">
             <p id="spielerNameR" style="font-size: 36px;font-weight: bold;margin-top: 0em;">
             </p>
             <p id="rechterZaehler" class="Zaehler" style="font-size: 160px;font-weight: bold;margin-top: -0.25em;">0</p>
