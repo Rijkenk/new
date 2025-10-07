@@ -1,6 +1,6 @@
 {
   "name": "Scoreboard 14-1",
-  "short_name": "Scorekeeper 14-1",
+  "short_name": "14-1",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -17,4 +17,5 @@
     }
   ]
 }
+
 
