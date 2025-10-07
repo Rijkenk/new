@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
-    <title>ScoreKeeper</title>
+    <title>8-9-10 Scoreboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="jquery.mobile-1.4.5.min.css">
     <script src="jquery-2.1.4.min.js"></script>
@@ -235,8 +235,8 @@
       <div data-role="header" data-position="fixed">
         <div class="ui-grid-b">
           <div class="ui-block-a"><!-- linker Block -->
-            <div style="float:left;"> <a id="btnVollbildAus" onclick="$(document).fullScreen(false);"
-
+            <div style="float:left;"> 
+				<a id="btnVollbildAus" onclick="$(document).fullScreen(false);"
                 href="#Scoreboard" class="ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-notext ui-icon-back">Back</a>
             </div>
             <div style="margin-top: 0.5em;"> <a class="" href="#popupSpWechseln"
@@ -245,6 +245,8 @@
 
                   id="14Ball" src="img/14-1Btn.svg" alt="14-1" height="30" width="60"></a>
             </div>
+
+  <input type="text" id="playerNameInputL" placeholder="Enter Name" style="font-size: 16px; padding: 0.3em; margin-bottom: 0.5em; width: 80%; text-align: center;">
           </div>
           <!-- Ende linker Block -->
           <div class="ui-block-b"><!-- mittel Block -->
@@ -254,6 +256,9 @@
           <div class="ui-block-c"><!-- rechter Block -->
             <p class="clock" align="center"></p>
             <a href="#Einstellungen" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-notext ui-icon-gear">Setup</a>
+
+  <input type="text" id="playerNameInputR" placeholder="Enter Name" style="font-size: 16px; padding: 0.3em; margin-bottom: 0.5em; width: 80%; text-align: center;">
+
           </div>
           <!-- Ende rechter Block --> </div>
         <!-- Ende grid-b --> </div>
@@ -287,11 +292,13 @@
           <!-- Ende mittel Block -->
           <div class="ui-block-c" align="center"><!-- rechter Block -->
             <p id="rechterZaehler" class="Zaehler" style="font-size: 200px;font-weight: bold;margin-top: -0.25em;">0</p>
+			
             <a id="pBtnRechterZaehler" href="#" data-role="button" data-inline="true"
 
               data-mini="true" data-icon="forward">+</a> <a id="mBtnRechterZaehler"
 
               href="#" data-role="button" data-inline="true" data-mini="true" data-icon="back">-</a>
+
           </div>
           <!-- Ende rechter Block --> </div>
         <!-- Ende grid-b --> </div>
@@ -336,7 +343,7 @@
             href="#" data-rel="back">Terug</a>
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b"
 
-            href="index.html"
+            href="14-1scoreboard.html"
 
             rel="external" data-transition="flow">Naar 14-1 Scoreboard</a>
           &nbsp;&nbsp;&nbsp;&nbsp;</div>
@@ -381,3 +388,4 @@
     <!-- /page history ende -->
   </body>
 </html>
+
