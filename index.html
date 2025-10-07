@@ -9,23 +9,15 @@
     <script src="jquery.mobile-1.4.5.min.js"></script>
     <script src="jquery.fullscreen-min.js"></script>
     <script src="localDB.min.js"></script>
-    <style>
-		
-{
-		border: 1px solid;
-		overflow: hidden;
-		text-align: center;
-	}
-		
-</style> <script>
+    <script>
 //Initialisierung
-	var rest = 15; 							var punkte = 0; 							var punkte1 = 0; 
-  var punkte2 = 0; 						var spielerAktiv = 0; 				var logText = ""; 
-  var runTo = 999; 						var anstoss = 0;							var foulRechts = 0; 
-  var foulzaehlerRechts = 0; 	var foulLinks = 0; 						var foulzaehlerLinks = 0; 
-  var aufnahmeHoechsteL = 0;	var aufnahmeHoechsteR = 0; 		var aufnahmeHoehe = 0;
-	var aufnahmen1 = 0; 				var aufnahmen2 = 0; 					var stoppuhr = 0; 
-  var pstoppuhr = 0; 					var wstoppuhr = 0;
+	var rest = 15; 							var punkte = 0; 						var punkte1 = 0; 
+	var punkte2 = 0; 						var spielerAktiv = 0; 					var logText = ""; 
+	var runTo = 999; 						var anstoss = 0;						var foulRechts = 0; 
+	var foulzaehlerRechts = 0; 				var foulLinks = 0; 						var foulzaehlerLinks = 0; 
+	var aufnahmeHoechsteL = 0;				var aufnahmeHoechsteR = 0; 				var aufnahmeHoehe = 0;
+	var aufnahmen1 = 0; 					var aufnahmen2 = 0; 					var stoppuhr = 0; 
+	var pstoppuhr = 0; 						var wstoppuhr = 0;						
     
 	localDB.schema('spielelog', ['zeitstempel','ereignis','rBaelle','aufnahmenL','aufnahmeHoeheL','foulzaehlerL','punkteL','punkteR','foulzaehlerR','aufnahmeHoeheR','aufnahmenR','spielzeit']); // DB Tabelle definieren
 	localDB.schema('spielelog2', ['zeitstempel','ereignis','rBaelle','aufnahmenL','aufnahmeHoeheL','foulzaehlerL','punkteL','punkteR','foulzaehlerR','aufnahmeHoeheR','aufnahmenR','spielzeit']); // DB Tabelle definieren
@@ -47,24 +39,25 @@ $(document).ready(function(){
 		spielStart();
 		ausblenden(15);
 		aufnahmeWechsel();
-		spieleLog('Break links');})
+		spieleLog('Break');
+	})
 	$('#btnBreakRechts').on( "vclick", function(){
 		anstoss = 2;
 		spielerAktiv = 2;
 		spielStart();
 		ausblenden(15);
 		aufnahmeWechsel();
-		spieleLog('Break rechts');
+		spieleLog('Break');
 	})
 	$('#15Ball').on( "vclick", function(event){
 		rest = 15;
-		punkte += 0;logText = " Abgabe"; aktualisieren();})
+		punkte += 0;logText = " Niks gepot"; aktualisieren();})
 	$('#14Ball').on( "vclick", function(){
 		rest = 14;
 		if ($('#15Ball').is(':visible')){
 			ausblenden(rest);
 			punkte += 1; logText = " +"+ punkte; aktualisieren();}
-		else{logText = " Abgabe"; aktualisieren();}})
+		else{logText = " Niks gepot"; aktualisieren();}})
 	$('#13Ball').on( "vclick", function(){
 		rest = 13;
 		switch (true) {
@@ -77,7 +70,7 @@ $(document).ready(function(){
 				punkte += 1;	logText = " +"+ punkte; aktualisieren();
 				break;
 			default:
-				logText = " Abgabe"; aktualisieren();
+				logText = " Niks gepot"; aktualisieren();
 				break;
 	} })
 	$('#12Ball').on( "vclick", function(){
@@ -96,7 +89,7 @@ $(document).ready(function(){
 				punkte += 1;	logText = " +"+ punkte; aktualisieren();
 				break;
 			default:
-				logText = " Abgabe"; aktualisieren();
+				logText = " Niks gepot"; aktualisieren();
 				break;
 	}})
 	$('#11Ball').on( "vclick", function(){
@@ -119,7 +112,7 @@ $(document).ready(function(){
 				punkte += 1;	logText = " +"+ punkte; aktualisieren();
 				break;
 			default:
-				logText = " Abgabe"; aktualisieren();
+				logText = " Niks gepot"; aktualisieren();
 				break;
 	}})
 	$('#10Ball').on( "vclick", function(){
@@ -146,7 +139,7 @@ $(document).ready(function(){
 				punkte += 1;	logText = " +"+ punkte; aktualisieren();
 				break;
 			default:
-				logText = " Abgabe"; aktualisieren();
+				logText = " Niks gepot"; aktualisieren();
 				break;
 	}})
 	$('#9Ball').on( "vclick", function(){
@@ -177,7 +170,7 @@ $(document).ready(function(){
 				punkte += 1;	logText = " +"+ punkte; aktualisieren();
 				break;
 			default:
-				logText = " Abgabe"; aktualisieren();
+				logText = " Niks gepot"; aktualisieren();
 				break;
 	}})	
 	$('#8Ball').on( "vclick", function(){
@@ -212,7 +205,7 @@ $(document).ready(function(){
 				punkte += 1;	logText = " +"+ punkte; aktualisieren();
 				break;
 			default:
-				logText = " Abgabe"; aktualisieren();
+				logText = " Niks gepot"; aktualisieren();
 				break;
 	}})
 	$('#7Ball').on( "vclick", function(){
@@ -251,7 +244,7 @@ $(document).ready(function(){
 				punkte += 1;	logText = " +"+ punkte; aktualisieren();
 				break;
 			default:
-				logText = " Abgabe"; aktualisieren();
+				logText = " Niks gepot"; aktualisieren();
 				break;
 	}})
 	$('#6Ball').on( "vclick", function(){
@@ -294,7 +287,7 @@ $(document).ready(function(){
 				punkte += 1;	logText = " +"+ punkte; aktualisieren();
 				break;
 			default:
-				logText = " Abgabe"; aktualisieren();
+				logText = " Niks gepot"; aktualisieren();
 				break;
 	}})
 	$('#5Ball').on( "vclick", function(){
@@ -341,7 +334,7 @@ $(document).ready(function(){
 				punkte += 1;	logText = " +"+ punkte; aktualisieren();
 				break;
 			default:
-				logText = " Abgabe"; aktualisieren();
+				logText = " Niks gepot"; aktualisieren();
 				break;
 	}})
 	$('#4Ball').on( "vclick", function(){
@@ -392,7 +385,7 @@ $(document).ready(function(){
 				punkte += 1;	logText = " +"+ punkte; aktualisieren();
 				break;
 			default:
-				logText = " Abgabe"; aktualisieren();
+				logText = " Niks gepot"; aktualisieren();
 				break;
 	}})
 	$('#3Ball').on( "vclick", function(){
@@ -447,7 +440,7 @@ $(document).ready(function(){
 				punkte += 1;	logText = " +"+ punkte; aktualisieren();
 				break;
 			default:
-				logText = " Abgabe"; aktualisieren();
+				logText = " Niks gepot"; aktualisieren();
 				break;
 	}})
 	$('#2Ball').on( "vclick", function(){
@@ -506,7 +499,7 @@ $(document).ready(function(){
 				punkte += 1;	logText = " +"+ punkte; aktualisieren();
 				break;
 			default:
-				logText = " Abgabe"; aktualisieren();
+				logText = " Niks gepot"; aktualisieren();
 				break;
 	}})
 	$('#1Ball').on( "vclick", function(){
@@ -569,7 +562,7 @@ $(document).ready(function(){
 				punkte += 1;	logText = " +"+ punkte; aktualisieren();
 				break;
 			default:
-				logText = " Abgabe"; aktualisieren();
+				logText = " Niks gepot"; aktualisieren();
 				break;
 	}})
 	$('#pBtnFoul1').on( "vclick", function(){
@@ -640,6 +633,7 @@ $(document).ready(function(){
 		var cursor = localDB.findAll('spielelog');
 		var logdata = cursor.fetch();
 		var i = cursor.count() - 1;
+
 		//logdata.reverse();
 		var jetzt = new Date();
 		for(i; i > 0; i--){
@@ -862,7 +856,7 @@ $(document).on("pageshow","#Scoreboard",function(){ // Wenn Page #Scoreboard gel
 			punkte1 = punkte1 + punkte;
 			$("#linkerZaehler").text(punkte1);
 			if (aufnahmeHoehe > aufnahmeHoechsteL){aufnahmeHoechsteL = aufnahmeHoehe; }
-			spieleLog("Links"+ logText);
+			spieleLog(logText, "Links");
 			if (rest > 1){
 				spielerAktiv = 2; aufnahmeHoehe = 0;aufnahmeHoehe = 0;
 			}else{
@@ -891,7 +885,7 @@ $(document).on("pageshow","#Scoreboard",function(){ // Wenn Page #Scoreboard gel
 			punkte2 = punkte2 + punkte;
 			$("#rechterZaehler").text(punkte2);
 			if (aufnahmeHoehe > aufnahmeHoechsteR){aufnahmeHoechsteR = aufnahmeHoehe; }
-			spieleLog("Rechts"+ logText);
+			spieleLog(logText, "Rechts");
 			if (rest > 1){
 				spielerAktiv = 1; aufnahmeHoehe = 0;aufnahmeHoehe = 0;
 			}else{
@@ -918,13 +912,15 @@ $(document).on("pageshow","#Scoreboard",function(){ // Wenn Page #Scoreboard gel
 			$('#rechterZaehler').fadeIn('slow');
 			$('#linkerZaehler').fadeIn('slow', function(){
 				if (punkte1 >= runTo){
-					$("#lblGewonnen").text("Links heeft GEWONNEN");
+  				var playerWin = $('#playerNameInputL').val();
+					$("#lblGewonnen").text(playerWin + " WINT!");
 					$("#popupGewonnen").popup("open");
 				}
 				if (punkte2 >= runTo){
-					$("#lblGewonnen").text("Rechts heeft GEWONNEN");
-					$("#popupGewonnen").popup("open");
-				}
+  				var playerWin = $('#playerNameInputR').val();
+  				$("#lblGewonnen").text(playerWin + " Wint!");
+  				$("#popupGewonnen").popup("open");
+}
 				$("#xZUy").html("Race naar : " + runTo + "<br>" + punkte1 +" : "+ punkte2);
 				$('#xZUy').css("text-align", "center");
 				aktualisiereStats();
@@ -951,10 +947,16 @@ $(document).on("pageshow","#Scoreboard",function(){ // Wenn Page #Scoreboard gel
 		spieleLog('Spel Hervat');
 		}
 // ##### Spiele Log ##### 
-	function spieleLog(aktion) {
+	function spieleLog(aktion, zijde) {
 		var jetzt = new Date();
-		var log = {zeitstempel: jetzt.getTime(),
-				ereignis: aktion,
+		//Haal spelersnamen uit tekstvak
+		    var naamL = $('#playerNameInputL').val();
+    		var naamR = $('#playerNameInputR').val();
+			var naam = (zijde === 'Links') ? naamL : naamR;
+
+		var log = {
+				zeitstempel: jetzt.getTime(),
+				ereignis: naam + ":" + aktion,
 				rBaelle: rest,
 				aufnahmenL: aufnahmen1,
 				aufnahmeHoeheL: aufnahmeHoechsteL,
@@ -1026,7 +1028,7 @@ $(document).on("pageshow","#Scoreboard",function(){ // Wenn Page #Scoreboard gel
           <!-- linker Block -->
           <div id="lBlock" class="ui-block-a" style="background-color:;" align="center"><!-- linker Block -->
 			  <!-- Textbox for entering name -->
-  <input type="text" id="playerNameInput" placeholder="Enter Name" style="font-size: 16px; padding: 0.3em; margin-bottom: 0.5em; width: 80%; text-align: center;">
+  <input type="text" id="playerNameInputL" placeholder="Enter Name" style="font-size: 16px; padding: 0.3em; margin-bottom: 0.5em; width: 80%; text-align: center;">
             <p id="spielerNameL" style="font-size: 36px;font-weight: bold;margin-top: 0em;">
             </p>
             <p id="linkerZaehler" class="Zaehler" style="font-size: 160px;font-weight: bold;margin-top: -0.25em;">0</p>
@@ -1080,7 +1082,7 @@ $(document).on("pageshow","#Scoreboard",function(){ // Wenn Page #Scoreboard gel
           <!-- rechter Block -->
           <div id="rBlock" class="ui-block-c" style="background-color:;" align="center">
 			  <!-- Textbox for entering name -->
-  <input type="text" id="playerNameInput" placeholder="Enter Name" style="font-size: 16px; padding: 0.3em; margin-bottom: 0.5em; width: 80%; text-align: center;">
+  <input type="text" id="playerNameInputR" placeholder="Enter Name" style="font-size: 16px; padding: 0.3em; margin-bottom: 0.5em; width: 80%; text-align: center;">
             <p id="spielerNameR" style="font-size: 36px;font-weight: bold;margin-top: 0em;">
             </p>
             <p id="rechterZaehler" class="Zaehler" style="font-size: 160px;font-weight: bold;margin-top: -0.25em;">0</p>
@@ -1219,7 +1221,7 @@ $(document).on("pageshow","#Scoreboard",function(){ // Wenn Page #Scoreboard gel
             href="#" data-rel="back">Terug</a>
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b"
 
-            href="file:///C:/Users/Dell%20Latitude%20E5570/Desktop/14-1%20app/scoreboard8910.html"
+            href="scoreboard8910.html"
 
             rel="external" data-transition="flow">Naar 8-9-10 Ball Scoreboard</a>
           &nbsp;&nbsp;&nbsp;&nbsp;</div>
@@ -1307,3 +1309,4 @@ $(document).on("pageshow","#Scoreboard",function(){ // Wenn Page #Scoreboard gel
     <!-- /page history ende -->
   </body>
 </html>
+
