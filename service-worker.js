@@ -8,8 +8,10 @@ const urlsToCache = [
     'localDB.min.js',
     'scoreboard8910.html',
   'manifest.json',
-  'img/icon-192.png',
+    'img/icon-192.png',
     'img/icon-512.png',
+    'img/icon-152.png',
+    'img/icon-180.png',
     'img/1B.svg',
     'img/2B.svg',
     'img/3B.svg',
@@ -47,3 +49,4 @@ self.addEventListener('fetch', event => {
     })
   );
 });
+
