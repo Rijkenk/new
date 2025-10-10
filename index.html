@@ -13,10 +13,7 @@
     
 	<script>
 		
-<link rel="apple-touch-icon" sizes="180x180" href="img/icon-192.png" />
-<link rel="apple-touch-icon" sizes="152x152" href="img/icon-512.png" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
 
 
 //Initialisierung
@@ -996,7 +993,14 @@ $(document).on("pageshow","#Scoreboard",function(){ // Wenn Page #Scoreboard gel
 		$(".timer").text(timerAusgabe);
 		//$(window).resize();
 	}
-</script> </head>
+</script> 
+  
+  <link rel="apple-touch-icon" sizes="180x180" href="img/icon-192.png" />
+<link rel="apple-touch-icon" sizes="152x152" href="img/icon-512.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  
+  </head>
   <body onload="setInterval(DateTime, 1000);">
     <div id="Scoreboard" data-role="page"> <!-- Header -->
       <div data-role="header" data-position="fixed">
